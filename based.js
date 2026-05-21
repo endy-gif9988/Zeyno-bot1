@@ -202,7 +202,7 @@ global.store = makeInMemoryStore({ logger });
 const connectionOptions = {
     logger: logger,
     mobile: MethodMobile,
-    browser: opzione === '1' ? Browsers.windows('Chrome') : methodCodeQR ? Browsers.windows('Chrome') : Browsers.macOS('Safari'),
+    browser: ['ElixirBot', 'Safari', '1.0.0'],
     auth: {
         creds: state.creds,
         keys: makeCacheableSignalKeyStore(state.keys, logger),
