@@ -1,3 +1,4 @@
+// Plug-in creato da elixir
 let handler = m => m
 
 async function addWarn(conn, m, target, reason, isBotAdmin) {
@@ -67,9 +68,8 @@ handler.before = async function (m, { conn, participants, isAdmin, isOwner, isSa
   
   if (!groupSize) return true
 
-  // Soglia di attivazione: se le menzioni superano il 70% dei membri
-  const ratio = uniqueMentioned.length / groupSize
-  if (ratio <= 0.7) return true
+  // Soglia di attivazione: se le menzioni superano 10 o il 70% dei membri
+  if (uniqueMentioned.length <= 10 && (uniqueMentioned.length / groupSize) <= 0.7) return true
 
   // Esecuzione Protocollo Blood
   if (isBotAdmin) {
