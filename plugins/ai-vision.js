@@ -1,0 +1,90 @@
+// Plug-in creato da elixir
+const apiKey = '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'
+const url = 'https://openrouter.ai/api/v1/chat/completions'
+const euroCost = 50
+
+let handler = async (m, { conn, quoted, usedPrefix, command }) => {
+  const user = global.db.data.users[m.sender]
+  if (!user) return
+  if (user.euro < euroCost) return m.reply(`💰 Ti servono *${euroCost}€* per usare l'AI Vision.\nHai solo *${user.euro}€*`)
+
+  // Determina il media da analizzare
+  let mediaMsg = m.quoted || m
+  let tipo = ''
+  let buffer = null
+  
+  if (mediaMsg.msg?.imageMessage) {
+    tipo = 'immagine'
+    buffer = await conn.downloadM(mediaMsg.msg.imageMessage, 'image')
+  } else if (mediaMsg.msg?.stickerMessage) {
+    tipo = 'sticker'
+    buffer = await conn.downloadM(mediaMsg.msg.stickerMessage, 'sticker')
+  } else if (mediaMsg.msg?.videoMessage) {
+    // Per i video, analizziamo un frame (thumbnail)
+    tipo = 'video'
+    buffer = mediaMsg.msg.videoMessage.jpegThumbnail ? 
+      Buffer.from(mediaMsg.msg.videoMessage.jpegThumbnail) : 
+      await conn.downloadM(mediaMsg.msg.videoMessage, 'video')
+  } else {
+    return m.reply(`📸 *Rispondi a un'immagine, uno sticker o un video* con \`.${command}\` per analizzarlo!\n\n*Esempio:* Rispondi a una foto e scrivi \`.${command}\``)
+  }
+
+  // Keep
+  let key = await m.reply('🔍 *Analizzando il contenuto con AI...*\n⏳ Caricamento su OpenRouter Vision...')
+  
+  try {
+    // Converti in base64
+    const base64 = buffer.toString('base64')
+    const mimeType = tipo === 'sticker' ? 'image/webp' : tipo === 'video' ? 'image/jpeg' : 'image/jpeg'
+    const dataUri = `data:${mimeType};base64,${base64}`
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+        'HTTP-Referer': 'https://elixirbot.x',
+        'X-Title': 'ElixirBot'
+      },
+      body: JSON.stringify({
+        model: 'google/gemini-flash-1.5',
+        messages: [{
+          role: 'user',
+          content: [
+            {
+              type: 'text',
+              text: `Analizza questo ${tipo} in italiano. Descrivi in modo dettagliato e ironico cosa vedi. Se è uno sticker, fa' una battuta divertente. Rispondi solo in italiano, massimo 400 caratteri.`
+            },
+            {
+              type: 'image_url',
+              image_url: { url: dataUri }
+            }
+          ]
+        }]
+      })
+    })
+
+    const data = await response.json()
+    const aiResponse = data.choices?.[0]?.message?.content || '🤖 Nessuna risposta ricevuta. Riprova.'
+    
+    user.euro -= euroCost
+    await conn.sendMessage(m.chat, { 
+      text: `*🔍 ANALISI AI* — ${tipo.toUpperCase()}\n\n${aiResponse}\n\n━━━━━━━━━━━\n💰 Costo: ${euroCost}€ | Saldo: ${user.euro}€`,
+      edit: key
+    })
+
+  } catch (e) {
+    console.error('[AI-VISION] Errore:', e)
+    await conn.sendMessage(m.chat, { 
+      text: `❌ Errore nell'analisi AI.\n${e.message}`,
+      edit: key
+    })
+  }
+}
+
+handler.help = ['analizza', 'occhioai']
+handler.tags = ['ai']
+handler.command = /^(analizza|occhioai|vision)$/i
+handler.group = true
+
+export default handler
