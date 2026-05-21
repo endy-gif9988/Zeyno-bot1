@@ -28,7 +28,7 @@ Sistema di hacking simulato più avanzato.
 
 *Comandi:*
 🜁 .hack
-🜁 .dox
+🜁 .doxx
 🜁 .breach
 🜁 .trace
 🜁 .intel
@@ -112,9 +112,9 @@ Inoltre, passi molto tempo a rileggere conversazioni vecchie di mesi.
         });
     }
 
-    // ====================== .DOX ======================
+    // ====================== .doxx ======================
 
-    if (m.text.toLowerCase().startsWith(prefix + 'dox')) {
+    if (m.text.toLowerCase().startsWith(prefix + 'doxx')) {
 
         await conn.sendMessage(m.chat, {
             text: `🕵️ *Avviando protocollo OSINT completo...*`
@@ -136,7 +136,7 @@ Inoltre, passi molto tempo a rileggere conversazioni vecchie di mesi.
 
         await conn.sendMessage(m.chat, {
             text:
-`🌫️ *DOXXING TERMINATO*
+`🌫️ *DOXING TERMINATO*
 
 ${name} presenta un’immagine forte e sicura di sé sui social, ma in realtà ha un forte bisogno di approvazione esterna.
 
@@ -338,7 +338,7 @@ handler.help = ['darkweb'];
 handler.tags = ['fun'];
 
 handler.command =
-/^(darkweb|dw|hack|dox|breach|trace|intel|shadow|blackmail|phish|ransomware|deepfake|reputation|anon)$/i;
+/^(darkweb|dw|hack|doxx|breach|trace|intel|shadow|blackmail|phish|ransomware|deepfake|reputation|anon)$/i;
 
 handler.group = true;
 
