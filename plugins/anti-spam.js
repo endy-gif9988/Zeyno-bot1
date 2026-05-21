@@ -1,14 +1,54 @@
+// Plug-in creato da elixir
 import crypto from 'crypto';
 
 const uzer = new Map();
 let lastCleanup = 0;
+
+// Rate limiter globale: se un utente invia 5 comandi in 3 secondi, viene silenziato per 1 minuto
+const rateLimitMap = new Map();
+
 const handler = m => m;
 
 handler.before = async function (m, { conn, isAdmin, isBotAdmin, isOwner, isSam }) {
     if (!m.isGroup) return;
     const chat = global.db.data.chats[m.chat] || {};
     
-    // Filtri di esclusione
+    // === RATE LIMITING GLOBALE: 5 comandi in 3 secondi = 1 minuto di silenzio ===
+    if (m.text && m.text.startsWith('.') || m.text && global.prefix?.test(m.text)) {
+        const now = Date.now()
+        const sender = m.sender
+        if (!rateLimitMap.has(sender)) {
+            rateLimitMap.set(sender, { count: 1, firstCmd: now, silencedUntil: 0 })
+        } else {
+            const data = rateLimitMap.get(sender)
+            
+            // Se è in silenzio, ignora
+            if (data.silencedUntil > now) {
+                console.log(`[RATE LIMIT] Utente ${sender} silenziato fino al ${new Date(data.silencedUntil).toLocaleTimeString()}`)
+                return
+            }
+            
+            // Reset contatore se passati 3 secondi
+            if (now - data.firstCmd > 3000) {
+                data.count = 1
+                data.firstCmd = now
+            } else {
+                data.count++
+                if (data.count >= 5) {
+                    data.silencedUntil = now + 60000 // 1 minuto
+                    data.count = 0
+                    console.log(`[RATE LIMIT] Utente ${sender} silenziato per 1 minuto (flood rilevato)`)
+                    await conn.sendMessage(m.chat, {
+                        text: `⏳ *RATE LIMIT* — @${sender.split('@')[0]}\n\nHai inviato troppi comandi in pochi secondi. Il bot ti ignorerà per *1 minuto* per proteggere la VPS.`,
+                        mentions: [sender]
+                    }).catch(() => {})
+                    return
+                }
+            }
+        }
+    }
+    
+    // Filtri di esclusione per anti-spam classico
     if (!chat.antispam || chat.modoadmin || isOwner || isSam || isAdmin || !isBotAdmin) return;
     if (m.message?.viewOnceMessage) return;
     if (['reactionMessage', 'pollUpdateMessage', 'protocolMessage'].includes(m.mtype)) return;
