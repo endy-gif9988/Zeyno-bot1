@@ -1,34 +1,43 @@
-import cp, { exec as _exec } from 'child_process';
-import { promisify } from 'util';
-import fs from 'fs';
-
-const exec = promisify(_exec).bind(cp);
+// Plug-in creato da elixir
+import fs from 'fs'
+import path from 'path'
 
 const handler = async (m, { conn, isROwner, usedPrefix, command, text }) => {
-  const ar = Object.keys(plugins);
-  const ar1 = ar.map((v) => v.replace('.js', ''));
+  const pluginsDir = path.join(process.cwd(), 'plugins')
+  
+  // Lista dei plugin esistenti
+  const pluginFiles = fs.readdirSync(pluginsDir).filter(f => f.endsWith('.js'))
+  const pluginNames = pluginFiles.map(v => v.replace('.js', ''))
 
   if (!text) {
-    return conn.reply(m.chat, `*🍬 Inserisci il nome di un plugin (file) esistente*\n\n*—◉ Esempio*\n*◉ ${usedPrefix + command}* info-infobot\n\n*—◉ Lista dei plugin (file) esistenti:*\n*◉* ${ar1.map((v) => ' ' + v).join`\n*◉*`}`, m);
+    return conn.reply(m.chat, `📂 *Lista Plugin Disponibili:*\n\n${pluginNames.map(v => `• ${v}`).join('\n')}\n\n*Uso:* ${usedPrefix + command} nome_plugin`, m)
   }
 
-  if (!ar1.includes(text)) {
-    return conn.reply(m.chat, `*🍭 Nessun plugin (file) trovato con il nome "${text}", inserisci un nome esistente*\n\n*==================================*\n\n*—◉ Lista dei plugin (file) esistenti:*\n*◉* ${ar1.map((v) => ' ' + v).join`\n*◉*`}`, m);
+  const filename = text.trim().replace('.js', '') + '.js'
+  const filePath = path.join(pluginsDir, filename)
+
+  if (!fs.existsSync(filePath)) {
+    return conn.reply(m.chat, `❌ Plugin "${text}" non trovato.\n\n*Plugin disponibili:*\n${pluginNames.map(v => `• ${v}`).join('\n')}`, m)
   }
 
-  let o;
   try {
-    o = await exec('cat plugins/' + text + '.js');
+    const content = fs.readFileSync(filePath, 'utf-8')
+    
+    // Invia prima il documento come file .js
+    await conn.sendMessage(m.chat, { 
+      document: Buffer.from(content, 'utf-8'), 
+      mimetype: 'text/javascript', 
+      fileName: filename 
+    }, { quoted: m })
+    
+    // Poi invia il contenuto come testo (se non è troppo lungo)
+    if (content.length < 4000) {
+      await conn.reply(m.chat, `📄 *Contenuto di ${filename}:*\n\n\`\`\`js\n${content}\n\`\`\``, m)
+    } else {
+      await conn.reply(m.chat, `📄 *${filename}* è troppo lungo (${content.length} caratteri).\nScarica il file per vedere il contenuto completo.`, m)
+    }
   } catch (e) {
-    o = e;
-  } finally {
-    const { stdout, stderr } = o;
-    if (stdout.trim()) {
-      await conn.sendMessage(m.chat, { document: fs.readFileSync(`./plugins/${text}.js`), mimetype: 'application/javascript', fileName: `${text}.js` }, { quoted: m });
-    }
-    if (stderr.trim()) {
-      await conn.sendMessage(m.chat, { document: fs.readFileSync(`./plugins/${text}.js`), mimetype: 'application/javascript', fileName: `${text}.js` }, { quoted: m });
-    }
+    return conn.reply(m.chat, `❌ Errore nella lettura del file: ${e.message}`, m)
   }
 };
 
