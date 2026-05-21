@@ -6,7 +6,7 @@ const uhuh = /\b(b[4a@]st[4a@]rd[0o]|[Ff][1iI][cC][4aA]|succh[i1][a4][l1][a4o0]|
 const uhuhEspansa = /\b(d[4a@]nn[4a@]t[o0]|[o0]m[nN][i1]c[4aA]|[sS][tT][uU]p[4aA]g[gG][i1]t[o0]|[mM][e3]rd[4aA]c[4aA]|[cC][uU]l[o0]|[cC][uU]l[4aA]|[fF][4aA]n[nN]c[o0]|[fF]r[o0]c[i1][o0]|[sS]c[4aA]m[4aA]p[4aA]|[rR][o0]tt[4aA]|[i1]m[pP]e[gG][nN]e|[dD][e3]b[i1]l[e3]|[cC]r[e3]t[i1]n[o0]|[rR][e3]t[4aA]rd[4aA]t[o0]|[mM][o0]n[nN][e3]z[zZ][4aA]|[fF][o0]r[o0]n[zZ]|[tT]r[o0]g[l1][i1]o0|[sS]tr[4aA]p[4aA]|[cC]h[i1]n[o0]di[mM]er[d4aA]|[fF]i[l1]i[o0]d[i1]p[uU]tt[4aA]n[4aA]|[bB][o0]s[tT]a[rR]d[o0]|[mM][i1]n[cC][hH][i1]a|[sS]c[4aA]g[gG]|[pP][o0]r[cC]o0|z[o0]cc[o0]l[i1]|[o0]m[nN][e3]t[o0]|b[o0]h[jJ]|[a4A]b[o0]rt[o0]|n[4aA]z[i1]|[fF]4a[sS]c[i1]|[tT]r[o0][i1][4aA]|[fF][o0]r[gG][4aA]s|[cC][4aA]nn[4aA]|[sS]cr[o0]t[o0]|[vV][i1]g[l1]|[4aA]z[zZ][o0]n[4aA]|[pP]utt[4aA]n[e3]ll[4aA]|[bB]est[e3]mm[i1][a4]|[dD][i1][o0]c[4aA]n[e3]|[pP]0rc[o0]|[dD][e3]m[o0]n[i1]|[cC][a4]zz[o0]|[mM]3rd[4aA]|[sS]tr0nz[o0]|putt4n4|figli0|m3rd4|stronz4|c4zz0|b3st3mm14|d10c4n3|p0rc0|d3m0n[i1]|[cC]h[e3]m[i1]c4a|[fF]r0c[i1]0|[i1]mp3gn3nt3)\b/i
 
 // Unione delle due regex
-const regexFinale = new RegExp(uhuh.source + '|' + uhuhEspansa.source, uhuh.flags + 'i')
+const regexFinale = new RegExp(uhuh.source + '|' + uhuhEspansa.source, 'i')
 
 let handler = m => m
 
