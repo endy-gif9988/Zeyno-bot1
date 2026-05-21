@@ -20,6 +20,9 @@ let handler = async (m, { conn, text, command, usedPrefix }) => {
             const module = await import(`${fileUrl}?update=${Date.now()}`)
             global.plugins[filename] = module.default || module
             
+            // Ricarica l'intero sistema di handler per attivare il plugin
+            await global.reloadHandler(true).catch(e => console.error('[saveplugin] Errore reload:', e))
+            
             return m.reply(`*───「 INSTALLED 」───*\n\n*📂 FILE:* \`${filename}\`\n*STATUS:* \`Attivo / Online\`\n\n*────────────────*`)
         } catch (e) {
             return m.reply(`\`[ERROR]: ${e.message}\``)
