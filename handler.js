@@ -448,7 +448,7 @@ if (!normalizedSender) return;
             goodbye: false,
             ai: false,
             vocali: false,
-            antiporno: false,
+            antiporno: true,
             antioneview: false,
             autolevelup: false,
             antivoip: false,
