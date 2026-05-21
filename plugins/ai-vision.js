@@ -8,25 +8,47 @@ let handler = async (m, { conn, quoted, usedPrefix, command }) => {
   if (!user) return
   if (user.euro < euroCost) return m.reply(`💰 Ti servono *${euroCost}€* per usare l'AI Vision.\nHai solo *${user.euro}€*`)
 
-  // Determina il media da analizzare
-  let mediaMsg = m.quoted || m
-  let tipo = ''
-  let buffer = null
+  // Determina il media da analizzare — sia diretto che citato
+  let q = m.quoted ? m.quoted : m
+  let mime = (q.msg || q).mimetype || ''
+  let mtype = q.mtype || ''
   
-  if (mediaMsg.msg?.imageMessage) {
-    tipo = 'immagine'
-    buffer = await conn.downloadM(mediaMsg.msg.imageMessage, 'image')
-  } else if (mediaMsg.msg?.stickerMessage) {
-    tipo = 'sticker'
-    buffer = await conn.downloadM(mediaMsg.msg.stickerMessage, 'sticker')
-  } else if (mediaMsg.msg?.videoMessage) {
-    // Per i video, analizziamo un frame (thumbnail)
-    tipo = 'video'
-    buffer = mediaMsg.msg.videoMessage.jpegThumbnail ? 
-      Buffer.from(mediaMsg.msg.videoMessage.jpegThumbnail) : 
-      await conn.downloadM(mediaMsg.msg.videoMessage, 'video')
-  } else {
+  // Verifica se il messaggio o il messaggio citato contengono un media valido
+  const isMedia = /image|video|sticker/i.test(mtype) || /image|video|webp/i.test(mime)
+  
+  if (!isMedia) {
     return m.reply(`📸 *Rispondi a un'immagine, uno sticker o un video* con \`.${command}\` per analizzarlo!\n\n*Esempio:* Rispondi a una foto e scrivi \`.${command}\``)
+  }
+  
+  // Determina il tipo
+  let tipo = ''
+  if (/sticker/i.test(mtype) || /webp/i.test(mime)) tipo = 'sticker'
+  else if (/video/i.test(mtype) || /video/i.test(mime)) tipo = 'video'
+  else tipo = 'immagine'
+  
+  // Scarica il buffer dal messaggio corretto (q)
+  let buffer
+  try {
+    if (tipo === 'sticker') {
+      buffer = await q.download()
+    } else if (tipo === 'video') {
+      // Per i video prova il thumbnail, altrimenti download intero
+      const frame = q.msg?.videoMessage?.jpegThumbnail
+      if (frame) {
+        buffer = Buffer.from(frame)
+      } else {
+        buffer = await q.download()
+      }
+    } else {
+      buffer = await q.download()
+    }
+  } catch (e) {
+    console.error('[AI-VISION] Download fallito:', e)
+    return m.reply('❌ Impossibile scaricare il media. Riprova.')
+  }
+
+  if (!buffer || buffer.length === 0) {
+    return m.reply('❌ Buffer vuoto. Il media potrebbe essere corrotto.')
   }
 
   // Keep
