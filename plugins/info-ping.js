@@ -35,10 +35,8 @@ let handler = async (m, { conn, usedPrefix }) => {
     const cpus    = os.cpus()
     const cpuName = cpus[0]?.model?.trim() || 'N/D'
     const cores   = cpus.length
-
-    // — Load average (1 min) —
-    const [load1] = os.loadavg()
-    const loadStr = load1.toFixed(2)
+    const [load1, load5, load15] = os.loadavg()
+    const cpuLoadPct = ((load1 / cores) * 100).toFixed(1)
 
     // — OS info —
     const platform = os.platform()
@@ -51,43 +49,55 @@ let handler = async (m, { conn, usedPrefix }) => {
     const totalGroups = totalChats.filter(([id]) => id.endsWith('@g.us')).length
     const totalDMs    = totalChats.filter(([id]) => !id.endsWith('@g.us')).length
 
+    // Health indicator
+    const healthEmoji = latency < 200 && ramPct < 80 && cpuLoadPct < 70 ? '🟢' : latency < 500 && ramPct < 90 ? '🟡' : '🔴'
+    const healthText = latency < 200 && ramPct < 80 && cpuLoadPct < 70 ? '💎 OTTIMO' : latency < 500 && ramPct < 90 ? '⚡ BUONO' : '🔥 CRITICO'
+
     const sep = '▸'
 
-    const message = `
-*ᴇʟɪxɪʀʙᴏᴛ* 🔮 — ꜱʏꜱᴛᴇᴍ ʀᴇᴘᴏʀᴛ
-${'─'.repeat(32)}
+    const message = `╔══════════════════════════╗
+║   🔮 *ELIXIRBOT SYSTEM* 🔮
+╚══════════════════════════╝
 
-⚡ *ᴘᴇʀꜰᴏʀᴍᴀɴᴄᴇ*
-${sep} ᴘɪɴɢ       » \`${latency} ms\`
-${sep} ᴜᴘᴛɪᴍᴇ     » \`${uptimeStr}\`
-${sep} ᴀᴠᴠɪᴏ      » \`${activationTime}\`
+━━━━━━━━━━━━━━━━━━━
+⚡ *PERFORMANCE*
+━━━━━━━━━━━━━━━━━━━
+${sep} Ping       » \`${latency} ms\`
+${sep} Uptime     » \`${uptimeStr}\`
+${sep} Attivo da  » \`${activationTime}\`
+${sep} Stato      » ${healthEmoji} \`${healthText}\`
 
-💾 *ᴍᴇᴍᴏʀɪᴀ*
-${sep} ꜱɪꜱᴛᴇᴍᴀ   » \`${toMB(usedRam)} / ${toMB(totalRam)} MB  (${ramPct}%)\`
-${sep} ʜᴇᴀᴘ      » \`${heapUsed} / ${heapTotal} MB\`
-${sep} ʀꜱꜱ       » \`${rss} MB\`
+━━━━━━━━━━━━━━━━━━━
+💾 *MEMORIA*
+━━━━━━━━━━━━━━━━━━━
+${sep} Sistema    » \`${toMB(usedRam)} / ${toMB(totalRam)} MB  (${ramPct}%)\`
+${sep} Heap       » \`${heapUsed} / ${heapTotal} MB\`
+${sep} RSS        » \`${rss} MB\`
 
-🖥️ *ꜱɪꜱᴛᴇᴍᴀ*
-${sep} ᴄᴘᴜ       » \`${cpuName}\`
-${sep} ᴄᴏʀᴇ      » \`${cores}\`
-${sep} ʟᴏᴀᴅ      » \`${loadStr}\`
-${sep} ᴏꜱ        » \`${platform} / ${arch}\`
-${sep} ɴᴏᴅᴇ      » \`${nodeVer}\`
+━━━━━━━━━━━━━━━━━━━
+🖥️ *SISTEMA*
+━━━━━━━━━━━━━━━━━━━
+${sep} CPU        » \`${cpuName} (${cores} core)\`
+${sep} Carico     » \`${cpuLoadPct}%\` (1m: ${load1.toFixed(2)} | 5m: ${load5.toFixed(2)} | 15m: ${load15.toFixed(2)})
+${sep} OS         » \`${platform} / ${arch}\`
+${sep} Node       » \`${nodeVer}\`
 
-📊 *ꜱᴛᴀᴛɪꜱᴛɪᴄʜᴇ*
-${sep} ᴜᴛᴇɴᴛɪ    » \`${totalUsers}\`
-${sep} ɢʀᴜᴘᴘɪ    » \`${totalGroups}\`
-${sep} ᴅᴍ        » \`${totalDMs}\`
+━━━━━━━━━━━━━━━━━━━
+📊 *STATISTICHE*
+━━━━━━━━━━━━━━━━━━━
+${sep} Utenti     » \`${totalUsers}\`
+${sep} Gruppi     » \`${totalGroups}\`
+${sep} DM         » \`${totalDMs}\`
 
-${'─'.repeat(32)}
-*ꜱᴛᴀᴛᴜꜱ* » 🟢 ᴏɴʟɪɴᴇ  •  *ᴏᴡɴᴇʀ* » ᴇʟɪxɪʀ`.trim()
+━━━━━━━━━━━━━━━━━━━
+${healthEmoji} *${healthText}*  •  🟢 Online  •  👑 Elixir`.trim()
 
     await conn.sendMessage(m.chat, {
       text: message,
       contextInfo: {
         externalAdReply: {
-          title: 'ᴇʟɪxɪʀʙᴏᴛ • ꜱʏꜱᴛᴇᴍ ʀᴇᴘᴏʀᴛ',
-          body: `ᴘɪɴɢ: ${latency}ms  •  ʀᴀᴍ: ${ramPct}%  •  ᴜᴘᴛɪᴍᴇ: ${uptimeStr}`,
+          title: 'ELIXIRBOT • SYSTEM REPORT',
+          body: `Ping: ${latency}ms • RAM: ${ramPct}% • CPU: ${cpuLoadPct}% • ${healthText}`,
           mediaType: 1,
           previewType: 0,
           renderLargerThumbnail: false,
