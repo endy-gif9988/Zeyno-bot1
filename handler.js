@@ -453,12 +453,15 @@ if (!normalizedSender) return;
             autolevelup: false,
             antivoip: false,
             rileva: false,
-            modoadmin: false,
-            antiLink: false,
+            modoadmin: true, // ✅ DEFAULT: ATTIVO - Solo admin possono comandare
+            antiLink: true,  // ✅ DEFAULT: ATTIVO - Blocca link WhatsApp
             antiLink2: false,
             reaction: false,
             antispam: false,
             safetyMode: false,
+            antiBot: true,   // ✅ DEFAULT: ATTIVO - Rileva e rimuove bot esterni
+            antiBot2: true,  // ✅ DEFAULT: ATTIVO - Blocca sub-bot
+            antinuke: true,  // ✅ DEFAULT: ATTIVO - Protezione anti-raid
             expired: 0,
             users: {}
         })
@@ -793,6 +796,9 @@ if (!normalizedSender) return;
                     fail('unreg', m, this)
                     continue
                 }
+
+                // ANTI-BAN: Micro-delay casuale 400-900ms prima di processare il comando
+                await new Promise(resolve => setTimeout(resolve, 400 + Math.floor(Math.random() * 500)))
 
                 m.isCommand = true
                 let xp = 'exp' in plugin ? parseInt(plugin.exp) : 17
