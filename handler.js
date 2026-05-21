@@ -505,6 +505,17 @@ if (!normalizedSender) return;
             return
         }
 
+        // === PROTEZIONE DM: Blocca utenti comuni in privato ===
+        if (!m.isGroup && !isOwner && !isROwner) {
+            console.log(`[DM BLOCK] Utente comune ${normalizedSender} bloccato in privato.`)
+            try {
+                await this.updateBlockStatus(m.chat, 'block')
+            } catch (e) {
+                console.error('[DM BLOCK] Errore nel bloccare utente:', e)
+            }
+            return // Silenzioso: nessun messaggio di risposta
+        }
+
         if (m.isGroup) {
             if (!groupMetadata) {
                 groupMetadata = await fetchGroupMetadataWithRetry(this, m.chat)
