@@ -1,4 +1,4 @@
-// plug-in di blood 
+// plug-in di Elixir 
 let handler = async (m, { conn }) => {
   let chatId = m.chat;
   let dati = global.db.data.chats[chatId]?.statsGiornaliere;
@@ -54,71 +54,6 @@ handler.before = async function (m) {
   }
   stats.utenti[m.sender].conteggio += 1;
 };
-
-// --- AUTOMAZIONE MEZZANOTTE CON TAG E PREMI ---
-let isResetting = false; 
-setInterval(async () => {
-    let ora = new Date().getHours();
-    let minuti = new Date().getMinutes();
-
-    if (ora === 0 && minuti === 0 && !isResetting) {
-        isResetting = true; 
-        let chats = global.db.data.chats;
-
-        for (let gid in chats) {
-            let dati = chats[gid]?.statsGiornaliere;
-            if (!dati || dati.totali === 0) continue;
-
-            let classifica = Object.entries(dati.utenti)
-                .sort(([, a], [, b]) => b.conteggio - a.conteggio)
-                .slice(0, 3);
-
-            if (classifica.length === 0) continue;
-
-            let reportFinal = `🌙 *RESOCONTO FINALE DELLA GIORNATA* 🌙\n`;
-            reportFinal += `──────────────────\n\n`;
-            reportFinal += `📊 Totale messaggi: *${dati.totali}*\n\n`;
-            reportFinal += `🏆 *PODIO E PREMI:* \n`;
-
-            const medaglie = ['🥇', '🥈', '🥉'];
-            const premi = [1000, 500, 250]; 
-            let mentions = [];
-
-            classifica.forEach(([jid, u], i) => {
-                let premio = premi[i];
-                mentions.push(jid);
-
-                if (!global.db.data.users[jid]) global.db.data.users[jid] = { money: 0 };
-                global.db.data.users[jid].money += (global.db.data.users[jid].money || 0) + premio;
-
-                reportFinal += `${medaglie[i]} @${jid.split('@')[0]}\n`;
-                reportFinal += `   └─ 💬 ${u.conteggio} messaggi | 💰 +$${premio}\n\n`;
-            });
-
-            reportFinal += `──────────────────\n`;
-            reportFinal += `✨ *Premi accreditati. Il database è stato resettato!*`;
-
-            try {
-                if (global.conn) {
-                    await global.conn.sendMessage(gid, { 
-                        text: reportFinal, 
-                        mentions: mentions 
-                    });
-                }
-            } catch (e) {
-                console.error(`Errore invio a ${gid}:`, e);
-            }
-
-            chats[gid].statsGiornaliere = { 
-                totali: 0, 
-                utenti: {}, 
-                data: new Date().toLocaleDateString('it-IT') 
-            };
-        }
-    } else if (minuti !== 0) {
-        isResetting = false; 
-    }
-}, 30000); 
 
 handler.help = ['resoconto'];
 handler.tags = ['strumenti'];
