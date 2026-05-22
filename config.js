@@ -11,39 +11,35 @@ import NodeCache from 'node-cache'
 const pkg = JSON.parse(fs.readFileSync('./package.json', 'utf-8'))
 const moduleCache = new NodeCache({ stdTTL: 300 });
 
-/*⭑⭒━━━✦❘༻☾⋆⁺₊✧ 𝕰𝕷𝕴𝖃𝕴𝕽𝕭𝕺𝕿✧₊⁺⋆☽༺❘✦━━━⭒⭑*/
+/*⭑⭒━━━✦❘༻☾⋆⁺₊✧𝛧𝚵𝐘𝐍𝐎 𝚩𝚯𝐓✧₊⁺⋆☽༺❘✦━━━⭒⭑*/
 
-global.sam = ['393784409415', '393514722317', '5491172448896', '6282364029306']
+global.sam = ['393501989497]
 global.owner = [
-  ['393784409415', 'Elixir', true],
-  ['393514722317', 'Momo', true],
-  ['6282364029306', 'Elixir VoIP', true],
-  ['992929328521', 'ElixirVoIP', true], 
-  ['15819750206', 'Axel', true],
-  ['5491172448896', 'Elixir VoIP', true],
-  ['393784409415', 'Elixir Secondary', true],
-  ['6282364029306', 'Elixir voip', true]
+  ['393501989497', 'ꪶ𝑬𝛮𝜞𝐲ꫂ', true]
+  ['212693877842', 'medalis', true]
+  ['77787623522', 'ksav', true]
+  ['254790385731', 'zak', true]
 ]
 
-global.mods = ['393784409415', '393514722317', '6282364029306', '5491156201079', '5491172448896', '6282364029306']
-global.prems = ['393784409415', '393514722317', '5491172448896', '5491156201079', '6282364029306', '6282364029306']
+global.mods = ['393501989497']
+global.prems = ['393501989497]
 
 /*⭑⭒━━━✦❘༻🩸 INFO BOT 🕊️༺❘✦━━━⭒⭑*/
 
-global.nomepack = '𝓔𝓛𝓘𝓧𝓘𝓡-𝓑𝓞𝓣'
-global.nomebot = '𝓔𝓛𝓘𝓧𝓘𝓡-𝓑𝓞𝓣'
-global.wm = '𝓔𝓛𝓘𝓧𝓘𝓡-𝓑𝓞𝓣'
-global.autore = 'ELIXIR'
-global.dev = 'ELIXIR'
-global.testobot = `𝓔𝓛𝓘𝓧𝓘𝓡-𝓑𝓞𝓣`
+global.nomepack = '𝛧𝚵𝐘𝐍𝐎 𝚩𝚯𝐓'
+global.nomebot = '𝛧𝚵𝐘𝐍𝐎 𝚩𝚯𝐓'
+global.wm = '𝛧𝚵𝐘𝐍𝐎 𝚩𝚯𝐓'
+global.autore = 'ꪶ𝑬𝛮𝜞𝐲ꫂ'
+global.dev = 'ꪶ𝑬𝛮𝜞𝐲ꫂ'
+global.testobot = `𝛧𝚵𝐘𝐍𝐎 𝚩𝚯𝐓`
 global.versione = pkg.version
-global.errore = '*ERRORE INATTESO*, UTILIZZA IL COMANDO .segnala (errore) per contattare lo sviluppatore. contatto diretto: +393784409415'
+global.errore = '*ERRORE INATTESO*, UTILIZZA IL COMANDO .segnala (errore) per contattare lo sviluppatore. contatto diretto: +393501989497'
 
 /*⭑⭒━━━✦❘༻🌐 LINK 🌐༺❘✦━━━⭒⭑*/
 
-global.repobot ='https//wa.me/393784409415'
-global.gruppo = 'https://chat.whatsapp.com/JOaqS04seMvFepBFp4Q4rL'
-global.insta = 'instagram.com/eli.xir_gg'
+global.repobot ='https//wa.me/393501989497'
+global.gruppo = 'https://chat.whatsapp.com/FdA61ZKYPB43WOIK6rUs8L?s=cl&p=a&mlu=3'
+global.insta = 'instagram.com/Endy.2011_'
 
 /*⭑⭒━━━✦❘༻ MODULI ༺❘✦━━━⭒⭑*/
 
